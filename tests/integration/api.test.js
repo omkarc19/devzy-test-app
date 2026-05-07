@@ -1,19 +1,15 @@
 const url = process.env.SANDBOX_URL;
+const d = url ? describe : describe.skip;
 
-const integrationTest = (name, fn) => {
-  if (url) test(name, fn);
-  else test.skip(`${name} (skipped: no SANDBOX_URL)`, fn);
-};
-
-describe('API integration (against running sandbox)', () => {
-  integrationTest('GET /api/status returns ok', async () => {
+d('API integration (against running sandbox)', () => {
+  test('GET /api/status returns ok', async () => {
     const r = await fetch(`${url}/api/status`);
     expect(r.ok).toBe(true);
     const j = await r.json();
     expect(j.status).toBe('ok');
   });
 
-  integrationTest('full visit lifecycle: create, fetch, list', async () => {
+  test('full visit lifecycle: create, fetch, list', async () => {
     const created = await fetch(`${url}/api/visit`, { method: 'POST' });
     expect(created.status).toBe(201);
     const { id } = await created.json();
@@ -27,7 +23,7 @@ describe('API integration (against running sandbox)', () => {
     expect(all.some((v) => v.id === id)).toBe(true);
   });
 
-  integrationTest('user signup then login flow', async () => {
+  test('user signup then login flow', async () => {
     const email = `test+${Date.now()}@example.com`;
     const sign = await fetch(`${url}/api/users`, {
       method: 'POST',
@@ -47,7 +43,7 @@ describe('API integration (against running sandbox)', () => {
     expect(user.email).toBe(email);
   });
 
-  integrationTest('login fails with wrong password', async () => {
+  test('login fails with wrong password', async () => {
     const email = `test+${Date.now()}@example.com`;
     await fetch(`${url}/api/users`, {
       method: 'POST',
