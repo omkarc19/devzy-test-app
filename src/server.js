@@ -1,8 +1,13 @@
 const express = require('express');
-const { db, dbPath } = require('./db');
+const path = require('path');
+const { dbPath } = require('./db');
+const visits = require('./visits');
+const users = require('./users');
+const { verifyPassword, generateToken } = require('./auth');
 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 const port = parseInt(process.env.PORT || '3000', 10);
 
@@ -16,14 +21,62 @@ app.get('/api/status', (_req, res) => {
   });
 });
 
+// Visits
 app.post('/api/visit', (_req, res) => {
-  const result = db.prepare('INSERT INTO visits DEFAULT VALUES').run();
-  res.status(201).json({ id: Number(result.lastInsertRowid) });
+  res.status(201).json(visits.createVisit());
+});
+app.get('/api/visits', (_req, res) => {
+  res.json(visits.listVisits());
+});
+app.get('/api/visit/:id', (req, res) => {
+  const v = visits.getVisit(parseInt(req.params.id, 10));
+  if (!v) return res.status(404).json({ error: 'not found' });
+  res.json(v);
 });
 
-app.get('/api/visits', (_req, res) => {
-  const rows = db.prepare('SELECT * FROM visits ORDER BY id DESC LIMIT 50').all();
-  res.json(rows);
+// Users
+app.post('/api/users', (req, res) => {
+  try {
+    const { email, password } = req.body || {};
+    res.status(201).json(users.createUser(email, password));
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+app.get('/api/users', (_req, res) => {
+  res.json(users.listUsers());
+});
+app.get('/api/users/:id', (req, res) => {
+  const u = users.getUser(parseInt(req.params.id, 10));
+  if (!u) return res.status(404).json({ error: 'not found' });
+  res.json(u);
+});
+app.delete('/api/users/:id', (req, res) => {
+  const ok = users.deleteUser(parseInt(req.params.id, 10));
+  res.status(ok ? 204 : 404).end();
+});
+
+app.patch('/api/users/:id/email', (req, res) => {
+  try {
+    const { email } = req.body || {};
+    const id = parseInt(req.params.id, 10);
+    const ok = users.updateUserEmail(id, email);
+    if (!ok) return res.status(404).json({ error: 'not found' });
+    res.json(users.getUser(id));
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
+// Auth
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password) return res.status(400).json({ error: 'email and password required' });
+  const u = users.getUserByEmail(email);
+  if (!u || !verifyPassword(password, u.password_hash)) {
+    return res.status(401).json({ error: 'invalid credentials' });
+  }
+  res.json({ token: generateToken(u.id), user: { id: u.id, email: u.email } });
 });
 
 const server = app.listen(port, () => {
@@ -36,3 +89,9 @@ const shutdown = (sig) => () => {
 };
 process.on('SIGTERM', shutdown('SIGTERM'));
 process.on('SIGINT', shutdown('SIGINT'));
+// ai generated TCs
+// ai generated TCs
+// ai generated TCs
+// ai generated TCs
+// ai generated TCs
+// ai generated TCs
