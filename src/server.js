@@ -56,6 +56,18 @@ app.delete('/api/users/:id', (req, res) => {
   res.status(ok ? 204 : 404).end();
 });
 
+app.patch('/api/users/:id/email', (req, res) => {
+  try {
+    const { email } = req.body || {};
+    const id = parseInt(req.params.id, 10);
+    const ok = users.updateUserEmail(id, email);
+    if (!ok) return res.status(404).json({ error: 'not found' });
+    res.json(users.getUser(id));
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
 // Auth
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body || {};

@@ -29,4 +29,14 @@ const deleteUser = (id) => {
   return r.changes > 0;
 };
 
-module.exports = { createUser, getUser, getUserByEmail, listUsers, deleteUser };
+const updateUserEmail = (id, newEmail) => {
+  if (!newEmail || typeof newEmail !== 'string' || !newEmail.includes('@')) {
+    throw new Error('invalid email');
+  }
+  const r = db.prepare('UPDATE users SET email = ? WHERE id = ?').run(newEmail, id);
+  return r.changes > 0;
+};
+
+module.exports = {
+  createUser, getUser, getUserByEmail, listUsers, deleteUser, updateUserEmail,
+};

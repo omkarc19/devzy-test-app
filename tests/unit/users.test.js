@@ -64,4 +64,19 @@ describe('users module', () => {
   test('deleteUser returns false when no row matches', () => {
     expect(users.deleteUser(99999)).toBe(false);
   });
+
+  test('updateUserEmail changes the email and returns true', () => {
+    const { id } = users.createUser('old@example.com', 'password123');
+    expect(users.updateUserEmail(id, 'new@example.com')).toBe(true);
+    expect(users.getUser(id).email).toBe('new@example.com');
+  });
+
+  test('updateUserEmail returns false for nonexistent id', () => {
+    expect(users.updateUserEmail(99999, 'x@y.com')).toBe(false);
+  });
+
+  test('updateUserEmail rejects invalid email', () => {
+    const { id } = users.createUser('a@b.com', 'password123');
+    expect(() => users.updateUserEmail(id, 'not-email')).toThrow('invalid email');
+  });
 });
