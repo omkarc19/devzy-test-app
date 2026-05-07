@@ -5,10 +5,17 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node tests/integration.test.js"
+    "test": "jest"
   },
   "dependencies": {
     "better-sqlite3": "^11.3.0",
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFiles": ["./jest.setup.js"]
   }
 }
