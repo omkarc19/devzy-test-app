@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const { dbPath } = require('./db');
 const visits = require('./visits');
 const users = require('./users');
@@ -6,6 +7,7 @@ const { verifyPassword, generateToken } = require('./auth');
 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 const port = parseInt(process.env.PORT || '3000', 10);
 

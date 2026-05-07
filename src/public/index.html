@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stub App</title>
+  <style>
+    body { font-family: -apple-system, system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.4rem; }
+    section { border: 1px solid #ddd; border-radius: 6px; padding: 1rem; margin-bottom: 1rem; }
+    h2 { font-size: 1rem; margin-top: 0; }
+    input, button { font-size: 1rem; padding: 0.4rem 0.6rem; margin-right: 0.5rem; }
+    button { cursor: pointer; }
+    .result { margin-top: 0.5rem; min-height: 1.2rem; color: #333; }
+    .count { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1 data-testid="heading">Stub App</h1>
+
+  <section data-testid="signup-section">
+    <h2>Sign up</h2>
+    <input data-testid="signup-email" placeholder="email" />
+    <input data-testid="signup-password" placeholder="password" type="password" />
+    <button data-testid="signup-submit">Create account</button>
+    <div class="result" data-testid="signup-result"></div>
+  </section>
+
+  <section data-testid="login-section">
+    <h2>Log in</h2>
+    <input data-testid="login-email" placeholder="email" />
+    <input data-testid="login-password" placeholder="password" type="password" />
+    <button data-testid="login-submit">Log in</button>
+    <div class="result" data-testid="login-result"></div>
+  </section>
+
+  <section data-testid="visits-section">
+    <h2>Visits</h2>
+    <button data-testid="visit-add">Record a visit</button>
+    <div class="result">Total: <span class="count" data-testid="visit-count">0</span></div>
+  </section>
+
+  <script>
+    const $ = (id) => document.querySelector('[data-testid="' + id + '"]');
+    const setText = (id, text) => { $(id).textContent = text; };
+
+    const refreshVisits = async () => {
+      const r = await fetch('/api/visits');
+      const visits = await r.json();
+      setText('visit-count', String(visits.length));
+    };
+
+    $('signup-submit').addEventListener('click', async () => {
+      const email = $('signup-email').value;
+      const password = $('signup-password').value;
+      const r = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const j = await r.json();
+      setText('signup-result', r.ok ? 'Account created (id ' + j.id + ')' : 'Error: ' + j.error);
+    });
+
+    $('login-submit').addEventListener('click', async () => {
+      const email = $('login-email').value;
+      const password = $('login-password').value;
+      const r = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const j = await r.json();
+      setText('login-result', r.ok ? 'Logged in as ' + j.user.email : 'Login failed');
+    });
+
+    $('visit-add').addEventListener('click', async () => {
+      await fetch('/api/visit', { method: 'POST' });
+      await refreshVisits();
+    });
+
+    refreshVisits();
+  </script>
+</body>
+</html>
