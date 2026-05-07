@@ -2,7 +2,7 @@ const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
   testDir: './tests/e2e',
-  timeout: 30_000,
+  timeout: 60_000,
   fullyParallel: false,
   retries: 0,
   reporter: 'list',
@@ -11,8 +11,14 @@ module.exports = defineConfig({
     headless: true,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
+    // Record video for every test. Devzy picks the demo-flow recording for the
+    // PR preview; other recordings are harmless leftovers in test-results/.
+    video: {
+      mode: 'on',
+      size: { width: 800, height: 600 },
+    },
   },
   projects: [
-    { name: 'chromium', use: { browserName: 'chromium' } },
+    { name: 'chromium', use: { browserName: 'chromium', viewport: { width: 800, height: 600 } } },
   ],
 });
