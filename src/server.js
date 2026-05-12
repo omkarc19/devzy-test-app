@@ -79,6 +79,13 @@ app.post('/api/auth/login', (req, res) => {
   res.json({ token: generateToken(u.id), user: { id: u.id, email: u.email } });
 });
 
+
+// Devzy demo endpoint
+app.post("/api/visit/clear", (_req, res) => {
+  const result = require("./db").db.prepare("DELETE FROM visits").run();
+  res.json({ deleted: result.changes });
+});
+
 const server = app.listen(port, () => {
   console.log(`[stub-app] listening on http://localhost:${port} db=${dbPath}`);
 });
