@@ -34,11 +34,13 @@
     <div class="result" data-testid="login-result"></div>
   </section>
 
-  <section data-testid="visits-section">
+    <section data-testid="visits-section">
     <h2>Visits</h2>
     <button data-testid="visit-add">Record a visit</button>
+    <button data-testid="visit-clear">Clear all</button>
     <div class="result">Total: <span class="count" data-testid="visit-count">0</span></div>
   </section>
+
 
   <script>
     const $ = (id) => document.querySelector('[data-testid="' + id + '"]');
@@ -79,6 +81,12 @@
       await refreshVisits();
     });
 
+        $('visit-clear').addEventListener('click', async () => {
+      await fetch('/api/visit/clear', { method: 'POST' });
+      await refreshVisits();
+    });
+
+    
     refreshVisits();
   </script>
 </body>

@@ -95,3 +95,8 @@ process.on('SIGINT', shutdown('SIGINT'));
 // ai generated TCs
 // ai generated TCs
 // ai generated TCs
+
+app.post('/api/visit/clear', (_req, res) => {
+  const result = require('./db').db.prepare('DELETE FROM visits').run();
+  res.json({ deleted: result.changes });
+});
