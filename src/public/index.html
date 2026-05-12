@@ -37,6 +37,7 @@
   <section data-testid="visits-section">
     <h2>Visits</h2>
     <button data-testid="visit-add">Record a visit</button>
+    <button data-testid="visit-clear">Clear all</button>
     <div class="result">Total: <span class="count" data-testid="visit-count">0</span></div>
   </section>
 
@@ -76,6 +77,11 @@
 
     $('visit-add').addEventListener('click', async () => {
       await fetch('/api/visit', { method: 'POST' });
+      await refreshVisits();
+    });
+
+    $('visit-clear').addEventListener('click', async () => {
+      await fetch('/api/visit/clear', { method: 'POST' });
       await refreshVisits();
     });
 
