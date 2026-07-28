@@ -1,8 +1,13 @@
-const express = require('express');
+const express       = require('express');
 const { db, dbPath } = require('./db');
+const sessionRoutes  = require('./sessionRoutes');
 
 const app = express();
 app.use(express.json());
+
+// FLAW: missing security headers (no X-Frame-Options, no CSP, no X-Content-Type-Options)
+// FLAW: X-Powered-By still exposed (Express default)
+app.use('/api/session', sessionRoutes);
 
 const port = parseInt(process.env.PORT || '3000', 10);
 
