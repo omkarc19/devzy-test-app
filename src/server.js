@@ -1,8 +1,22 @@
 const express = require('express');
 const { db, dbPath } = require('./db');
+const userRoutes = require('./userRoutes');
 
 const app = express();
+
+// FLAW: CORS wildcard with credentials allowed — any origin can make authenticated requests
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE');
+  res.setHeader('Access-Control-Allow-Headers', '*');
+  next();
+});
+
+// FLAW: X-Powered-By header not removed — reveals Express version
 app.use(express.json());
+
+app.use('/api', userRoutes);
 
 const port = parseInt(process.env.PORT || '3000', 10);
 
