@@ -10,6 +10,14 @@ db.exec(`
     id INTEGER PRIMARY KEY,
     at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id       INTEGER PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    role     TEXT NOT NULL DEFAULT 'user',
+    at       TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `);
 
 module.exports = { db, dbPath };
