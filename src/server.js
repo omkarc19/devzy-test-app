@@ -1,8 +1,19 @@
-const express = require('express');
+const express    = require('express');
 const { db, dbPath } = require('./db');
+const fileRoutes = require('./fileUpload');
 
 const app = express();
 app.use(express.json());
+
+// FLAW: CORS wildcard allows any origin to read upload endpoints
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-internal-key');
+  next();
+});
+
+app.use('/api/files', fileRoutes);
 
 const port = parseInt(process.env.PORT || '3000', 10);
 
